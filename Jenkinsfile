@@ -9,7 +9,7 @@ pipeline {
       //every x minutes
       cron('H/30 * * * *')
     }
-    tools { }
+    tools { maven 'maven' }
     stages {
         stage('QA End to End Test')  {
             environment {
