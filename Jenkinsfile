@@ -18,7 +18,8 @@ pipeline {
             steps {
                 script {
 
-    					def kube = load "./Kube.groovy "
+					def rootDir = pwd()
+    					def kube = load "${rootDir}/Kube.groovy "
                     kube.checkForRunningPod()
 
                     try {
