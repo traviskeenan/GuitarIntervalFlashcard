@@ -18,7 +18,8 @@ pipeline {
             steps {
                 script {
 
-                    Kube.checkForRunningPod()
+    					def kube = load "./Kube.groovy "
+                    kube.checkForRunningPod()
 
                     try {
                         configFileProvider([configFile(fileId: 'global-maven-settings', variable: 'MAVEN_SETTINGS')]) {
