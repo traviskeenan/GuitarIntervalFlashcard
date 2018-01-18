@@ -51,12 +51,29 @@ def failureMessage(String environment, String msg){
     echo msg
 }
 
+
+def nullTrustManager = [
+    checkClientTrusted: { chain, authType ->  },
+    checkServerTrusted: { chain, authType ->  },
+    getAcceptedIssuers: { null }
+]
+
+def nullHostnameVerifier = [
+    verify: { hostname, session -> true }
+]
+
+
 def checkForRunningPod() {
 
     String token = new File('/var/run/secrets/kubernetes.io/serviceaccount/token').text
     def connection = new URL( "https://kubernetes.default.skydns.local:6443/api/v1/namespaces/cloud-optimization-qa/pods")
             .openConnection() as HttpURLConnection
-    connection.ignoreSSLIssues()
+
+	SSLContext sc = SSLContext.getInstance("SSL")
+	sc.init(null, [nullTrustManager as X509TrustManager] as TrustManager[], null)
+	connection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+	connection.setDefaultHostnameVerifier(nullHostnameVerifier as HostnameVerifier)
+
     connection.setRequestProperty( "Authorization", "Bearer " + token )
     println connection.responseCode + ": " + connection.inputStream.text
 }
