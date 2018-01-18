@@ -9,7 +9,7 @@ pipeline {
       //every x minutes
       cron('H/30 * * * *')
     }
-    tools { maven 'maven' }
+    tools { }
     stages {
         stage('QA End to End Test')  {
             environment {
@@ -54,12 +54,9 @@ def failureMessage(String environment, String msg){
 def checkForRunningPod() {
 
     String token = new File('/var/run/secrets/kubernetes.io/serviceaccount/token').text
-
-    String kubeCommand = 'curl --insecure --header \"Authorization: Bearer ' +
-    token + '\" https://kubernetes.default.skydns.local:6443/api/v1/namespaces/cloud-optimization-qa/pods'
-    
-    def kubeResponse = sh script: kubeCommand, returnStdout: true
-    println("kubeCommand is:  " + kubeCommand)
-    println("kubeResponse is:  " + kubeResponse)
-
+    def connection = new URL( "https://kubernetes.default.skydns.local:6443/api/v1/namespaces/cloud-optimization-qa/pods")
+            .openConnection() as HttpURLConnection
+    connection.ignoreSSLIssues()
+    connection.setRequestProperty( "Authorization", "Bearer " + token )
+    println connection.responseCode + ": " + connection.inputStream.text
 }
