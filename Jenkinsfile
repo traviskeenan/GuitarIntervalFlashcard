@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
 
-                    kube.checkForRunningPod()
+                    Kube.checkForRunningPod()
 
                     try {
                         configFileProvider([configFile(fileId: 'global-maven-settings', variable: 'MAVEN_SETTINGS')]) {
