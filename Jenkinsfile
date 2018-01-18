@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
 
-                    checkForRunningPod()
+                    kube.checkForRunningPod()
 
                     try {
                         configFileProvider([configFile(fileId: 'global-maven-settings', variable: 'MAVEN_SETTINGS')]) {
@@ -51,19 +51,3 @@ def failureMessage(String environment, String msg){
     echo msg
 }
 
-def checkForRunningPod() {
-	String token = new File('/var/run/secrets/kubernetes.io/serviceaccount/token').text
-
-    String kubeCommand = 'curl --insecure --header \"Authorization: Bearer ' +
-    token + '\" https://kubernetes.default.skydns.local:6443/api/v1/namespaces/cloud-optimization-qa/pods'
-    
-    def kubeResponse = sh script: kubeCommand, returnStdout: true
-    println("kubeCommand is:  " + kubeCommand)
-    println("kubeResponse is:  " + kubeResponse)
-    
-    def jsonSlurper = new JsonSlurper()
-	def jsonResponse = jsonSlurper.parseText(kubeResponse)
-
-	println("jsonResponse: " + jsonResponse)	
-    
-}
