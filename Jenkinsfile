@@ -51,7 +51,7 @@ def checkForRunningPod() {
 
     def myObject = readJSON text: kubeResponse
     myObject.items.each { 
-    		if( it.startsWith("co-sso-api") {
+    		if(it.startsWith("co-sso-api")) {
     			echo "This item: " + item.metadata.name
     		}
     }
