@@ -1,4 +1,4 @@
-service = "end-to-end"
+service = "sso"
 runBuildFlag = false
 mavenVersion = ""
 gitCommit = ""
@@ -51,6 +51,8 @@ def checkForRunningPod() {
 
     def myObject = readJSON text: kubeResponse
     myObject.items.each { item ->
-        echo "This item: " + item.metadata.name
+    		if(item.startsWith("co-sso-api") {
+        		echo "This item: " + item.metadata.name
+        	}
     }
 }
