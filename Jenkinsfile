@@ -17,19 +17,7 @@ pipeline {
             }
             steps {
                 script {
-
-					def rootDir = pwd()
-    					def kube = load "${rootDir}@./Kube.groovy"
-                    kube.checkForRunningPod()
-
-                    try {
-                        configFileProvider([configFile(fileId: 'global-maven-settings', variable: 'MAVEN_SETTINGS')]) {
-                            sh "mvn test -Dspring.profiles.active=qa -Dselenium-grid=kube"
-                        }
-                    } catch (exc) {
-                        failureMessage("cloud-optimization-end-to-end-test", "End to end test failure")
-                        throw (exc)
-                    }
+                		checkForRunningPod()
                     successMessage("cloud-optimization-end-to-end")
                 }
             }
@@ -53,3 +41,16 @@ def failureMessage(String environment, String msg){
     echo msg
 }
 
+def checkForRunningPod() {
+    String token = new File('/var/run/secrets/kubernetes.io/serviceaccount/token').text
+
+    String kubeCommand = 'curl --insecure --header \"Authorization: Bearer ' +
+    token + '\" https://kubernetes.default.skydns.local:6443/api/v1/namespaces/cloud-optimization-qa/pods'
+
+    def kubeResponse = sh script: kubeCommand, returnStdout: true
+
+    def myObject = readJSON text: kubeResponse
+    myObject.items.each { item ->
+        echo "This item: " + item.metadata.name
+    }
+}
